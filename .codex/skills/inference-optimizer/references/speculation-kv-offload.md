@@ -1,0 +1,19 @@
+# Speculative decoding and reusable KV storage
+
+Read when the target is decode latency, repeated long prefixes, or cache pressure. Recheck the exact engine release and model card before selecting flags; support changes quickly.
+
+## Draft and MTP discovery
+
+Search the live Hugging Face Hub and model-author documentation for the **exact target model and revision**: built-in MTP heads, separately published MTP/assistant heads, EAGLE-style speculators, ordinary smaller draft models, DFlash/DSpark variants, and draft-free n-gram or suffix methods. An MTP head may be bundled with the target or published separately; do not infer one exists from a similarly named repository. Inspect draft model card and configuration for target revision, tokenizer/vocabulary, hidden-state interface, supported precision, context length, license, and tested engine/version. The draft path must also fit memory at the requested full context and concurrency.
+
+DFlash is a block-diffusion speculative drafter from Z Lab, distinct from DeepSeek's model-specific MTP work. It needs a compatible trained speculator and serving implementation; its name is not a universal speedup promise. Compare the no-speculation baseline with supported MTP, DFlash/DSpark, EAGLE, and low-overhead draft-free methods. Sweep draft length/steps only within the checkpoint's supported configuration. Record proposed and accepted tokens, rejection rate, draft/verify time, TTFT, inter-token latency, per-request and aggregate tokens/s, p95 latency, extra VRAM, and behavior at high concurrency and full context. Keep the best method only if end-to-end gains survive representative traffic and quality checks. Speculation can lose at high batch sizes or when draft overhead, KV traffic, or memory pressure dominates.
+
+Primary references: [vLLM speculative decoding](https://docs.vllm.ai/en/latest/features/speculative_decoding/), [vLLM Speculators DFlash](https://github.com/vllm-project/speculators/blob/main/docs/user_guide/algorithms/dflash.md), [Z Lab DFlash](https://z-lab.ai/projects/dflash/), [SGLang releases](https://github.com/sgl-project/sglang/releases).
+
+## KV reuse, CPU tiers, and SSD tiers
+
+Separate three mechanisms: (1) GPU prefix caching reuses identical token prefixes already resident on GPU; (2) CPU/SSD **KV offload** stores completed reusable KV blocks in a slower tier and promotes a hit back to GPU, avoiding some prefill recomputation; (3) weight/parameter CPU offload moves model weights and is a different feature. KV offload is storage and transfer, not CPU execution of attention. It does **not** by itself guarantee more GPU memory for simultaneously active decode requests or make a full-context request fit. Prefix hits require matching tokenized prefixes and compatible cache keys; measure real hit rates and avoid cross-user reuse when isolation is required.
+
+For vLLM, check the installed release's `OffloadingConnector`/CPU tier, optional filesystem secondary tier, LMCache integration, and Mooncake store before prescribing one. Verify whether SSD is supported by that exact connector and version; do not generalize one connector's capability to every offload path. Ask the user whether the expected reduction in repeated prefill is worth RAM/SSD use, transfer latency, extra processes, and operational complexity. Benchmark cold versus warm prefixes, GPU/CPU/SSD hit rates, bytes moved, TTFT, p95 latency, host memory, SSD I/O/endurance, and concurrency. A low hit rate or slow tier can make offload worse. Use the simplest tier that beats the baseline.
+
+Primary references: [vLLM automatic prefix caching](https://docs.vllm.ai/en/latest/design/prefix_caching/), [vLLM KV offloading](https://docs.vllm.ai/en/latest/features/kv_offloading_usage/), [vLLM LMCache examples](https://docs.vllm.ai/en/latest/examples/others/lmcache/), [vLLM Mooncake store](https://docs.vllm.ai/en/latest/features/mooncake_store_connector_usage/).
