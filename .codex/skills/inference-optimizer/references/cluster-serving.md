@@ -10,6 +10,8 @@ Use the user's **approximately 500–600 weekly active users** guideline as a de
 
 Distinguish three decisions: replicating complete model servers for throughput/availability; sharding one model across GPUs/nodes for fit or performance; and separating prefill from decode. They can compose, but solve different constraints.
 
+Use [parallelism experiments](parallelism-experiments.md) to select the engine layout before the fleet comparison. For disaggregated serving, tune prefill and decode layouts separately after their connector compatibility is established; do not assume the same TP/PP/DP/EP choice wins for both phases.
+
 ## Introduce llm-d routing before splitting stages
 
 Use a current [llm-d deployment recipe](https://github.com/llm-d/llm-d) and inspect its versioned [architecture](https://llm-d.ai/docs/architecture): gateway/proxy, Endpoint Picker (EPP), InferencePool, and model-server pods. Pin charts/manifests, CRD versions, router/sidecar images, engine images, and checkpoint revisions. Do not invent manifests from a stale API example.

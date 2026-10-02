@@ -12,6 +12,7 @@ Start with [the inference-optimizer skill](.codex/skills/inference-optimizer/SKI
 - OpenAI Chat Completions, OpenAI Responses, and Anthropic Messages contract testing.
 - MTP and other speculative decoding methods, prefix reuse, and CPU/SSD KV tiers.
 - Community builds and quantization plugins, issue-first troubleshooting, and legacy GPU/Vulkan routing.
+- Sequential multi-GPU TP, PP, DP, and MoE EP experiments, with realistic serving-load comparisons.
 - llm-d cache-aware routing, prefill/decode disaggregation, pool sizing, and production workload benchmarks.
 
 Defaults are one active user when the workload is vague, a 4-bit weight candidate, and the model's full native context. FP8 KV is the preferred optimized candidate where supported and validated. The skill asks for requirements that affect deployment and keeps correctness, quality, memory, and latency checks in the optimization loop.

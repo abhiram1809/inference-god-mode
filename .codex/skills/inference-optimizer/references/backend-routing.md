@@ -25,6 +25,8 @@ For Blackwell, distinguish GPU SKU and compute capability, genuine NVFP4 checkpo
 
 If this exact model/quant/GPU path is missing or falls back to slow kernels, investigate [official specialized builds and community images/plugins](community-builds.md). Identify the precise gap and source changes. A100, RTX PRO 6000, B200, and DGX Spark need separate qualification; a Blackwell family name does not establish binary or kernel compatibility.
 
+For multiple GPUs, use [parallelism experiments](parallelism-experiments.md) to compare feasible TP, PP, DP, and MoE EP layouts in order. Engine choice does not determine the best layout; check current model/quantization support, memory placement, and communication cost.
+
 ## Apple Silicon
 
 Use the exact chip and unified-memory budget, allowing for the operating system and other applications. MLX-LM is a straightforward path for an MLX checkpoint and a single user. Its documented server supplies an OpenAI-like Chat Completions route, has limited production safeguards, and 4-bit KV quantization disables batching; verify before choosing it for concurrent service. vLLM-Metal is a vLLM hardware plugin using MLX; confirm that the model, quantization, and required endpoints work on the installed release. llama.cpp is the GGUF alternative, especially when API dialects or partial offload matter. Benchmark actual prompt and decode lengths rather than relying on a generic tokens/s claim.
