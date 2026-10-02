@@ -10,6 +10,8 @@ For each candidate, record three separate facts: the on-disk encoding, the in-me
 
 ## Capacity estimate
 
+First classify components using [architecture-specific cost models](architecture-cost-models.md). Add resident weights/lookup tables, encoder outputs and cross-attention state, recurrent state, decoder KV where present, and transient buffers using their actual placement and lifetimes. Peak memory follows overlapping lifetimes; do not count every transient as permanently live or omit state retained across phases. The formula below is for conventional full-attention decoder self-attention, not the total cache of every architecture.
+
 Four-bit raw *packed* weight storage is approximately `parameters × 0.5 bytes`; scales, zero points, unquantized layers, embeddings, alignment, and runtime conversion can increase resident memory. For MoE, resident weight sizing generally uses **total** parameters, not only active parameters per token; account explicitly for any expert offload. The KV cache is independent of weight quantization. For a conventional full-attention decoder, a rough per-sequence KV estimate is:
 
 `2 × layers × context_tokens × KV_heads × head_dim × bytes_per_KV_element`

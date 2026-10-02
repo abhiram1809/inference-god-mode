@@ -7,6 +7,7 @@ Start with [the inference-optimizer skill](.codex/skills/inference-optimizer/SKI
 ## What it covers
 
 - Hardware inventory, runtime-specific memory sizing, full native context, and realistic concurrency.
+- Architecture-specific capacity and throughput ceilings across quantizations, including MoE, lookup tables, encoder/decoder and hybrid components, and TTS pipelines; compare measured efficiency against theoretical and calibrated estimates.
 - Live checkpoint discovery, 4-bit weight candidates, NVFP4 kernel verification, and FP8 KV evaluation.
 - vLLM, SGLang, TensorRT-LLM, and llama.cpp; MLX-LM/vLLM-Metal for Apple Silicon. Ollama is excluded.
 - OpenAI Chat Completions, OpenAI Responses, and Anthropic Messages contract testing.
